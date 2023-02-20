@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Bouncing Video on Canvas</title>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <style>
+            #vid {
+                position: absolute;
+                display: none;
+            }
+
+            #canvas {
+                position: absolute;
+                z-index: 10;
+                top: 0px;
+                left: 0px;
+            }
+
+            #revbtn {
+                position: absolute;
+                z-index: 20;
+            }
+        </style>
+        <script type="text/javascript">
+            var canvas1, ctx, cwidth, cheight, videow, videoh, maskrad, v;
+            var ballrad = 50;
+            var ballx = 50;
+            var bally = 50;
+            var ballvx = 2;
+            var ballvy = 4;
+
+            function restart() {
+                v.currentTime = 0;
+                v.play();
+            }
+
+            function init() {
+                canvas1 = document.getElementById("canvas");
+                ctx = canvas1.getContext('2d');
+                canvas1.width = window.innerWidth;
+                cwidth = canvas1.width;
+                canvas1.height = window.innerHeight;
+                cheight = canvas1.height;
+                v = document.getElementById('vid');
+                aspect = v.videoWidth / v.videoHeight;
+                v.width = Math.min(v.videoWidth * .5 * cheight);
+                v.width = aspect * v.height;
+
+                window.onscroll = function () {
+                    window.scrollTo(0, 0);
+                };
+
+                videow = v.width;
+                videoh = v.height;
+                ballrad = Math.min(.5 * vidoeh, .5 * videow);
+                ctx.lineWidth  = ballrad;
+                ctx.strokeStyle = "rbg (200, 0, 50)";
+                ctx.fillStyle = "white";
+                v.play();
+                setInterval();
+            }
+
+            function drawscene() { 
+                ctx.clearRect(0,0,cwidth,cheight); 
+                checkPosition(); 
+                ctx.drawImage(v, ballx, bally, videow, videoh);
+                ctx.beginPath(); 
+                ctx.moveTo(ballx,bally); 
+                ctx.lineTo(ballx+videow+2,bally); 
+                ctx.lineTo(ballx+videow+2,bally+.5*videoh+2);
+                ctx.lineTo(ballx+.5*videow+ballrad, bally+.5*videoh+2);
+                ctx.arc(ballx+.5*videow,bally+.5*videoh,ballrad,0, Math.PI,true);
+                ctx.lineTo(ballx,bally+.5*videoh); 
+                ctx.lineTo(ballx,bally); 
+                ctx.fill(); 
+                ctx.closePath(); 
+                ctx.beginPath(); 
+                ctx.moveTo(ballx,bally+.5*videoh); 
+                ctx.lineTo(ballx,bally+videoh); 
+                ctx.lineTo(ballx+videow+2,bally+videoh); 
+                ctx.lineTo(ballx+videow+2,bally+.5*videoh-2);
+                ctx.lineTo(ballx+.5*videow+ballrad, bally+.5*videoh-2);
+                ctx.arc(ballx+.5*videow,bally+.5*videoh,ballrad,0,Math.PI,false);
+                ctx.lineTo(ballx,bally+.5*videoh); 
+                ctx.fill(); 
+                ctx.closePath(); 
+                ctx.strokeRect(0,0,cwidth,cheight); 
+            } 
+            
+            function checkPosition() { 
+                var nballx = ballx + ballvx+.5*videow; 
+                var nbally = bally +ballvy+.5*videoh; 
+                if (nballx > cwidth) { 
+                    ballvx =-ballvx; 
+                    nballx = cwidth; 
+                    }
+
+                if (nballx < 0) { 
+                    nballx = 0; 
+                    ballvx = -ballvx; 
+                } 
+
+                if (nbally > cheight) { 
+                    nbally = cheight; 
+                    ballvy =-ballvy; 
+                } 
+
+                if (nbally < 0) { 
+                    nbally = 0; 
+                    ballvy = -ballvy; 
+                } 
+
+                ballx = nballx-.5*videow; 
+                bally = nbally-.5*videoh; 
+            }  
+
+            function reverse() { 
+            ballvx = -ballvx; 
+            ballvy = -ballvy; 
+            }
+        </script>
+    </head>
+    <body onload="init();">
+        <video id="vid" loop="loop" preload="auto" muted>
+            <source src="gaga.mp4" type='video/mp4 codecs="avc1.42E01E, mp4a.40.2"'>
+        </video>
+        <button id="revbtn" onclick="reverse();">Reverse</button><br/>  
+        <canvas id="canvas">This browser does not support HTML5 Canvas</canvas>
+    </body>
+</html>
